@@ -1,11 +1,11 @@
 from rest_framework import viewsets, generics, status, permissions
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser
-from .models import WeddingHalls, Wedding, Service, User, Food, Menu, Shift, Comment, System
+from .models import WeddingHalls, Wedding, Service, User, Food, Menu, Shift, Comment, System, BankAccount
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .serializers import WeddingHallSerializer, WeddingSerializer, WeddingDetailSerializer, UserSerializer,\
-    ServiceSerializer, FoodSerializer, MenuSerializer, ShiftSerializer, CommentSerializer, SystemSerializer
+from .serializers import WeddingHallSerializer, WeddingSerializer, WeddingDetailSerializer, UserSerializer, \
+    ServiceSerializer, FoodSerializer, MenuSerializer, ShiftSerializer, CommentSerializer, SystemSerializer, BankAcSerializer
 from .paginators import MBasePagination
 from django.http import Http404
 
@@ -43,6 +43,7 @@ class WeddingViewSet(viewsets.ViewSet,
     queryset = Wedding.objects.filter(active=True)
     serializer_class = WeddingDetailSerializer
     pagination_class = MBasePagination
+
     # permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
@@ -68,7 +69,6 @@ class WeddingViewSet(viewsets.ViewSet,
             return super().partial_updat(request, *args, **kwargs)
 
         return Response(status=status.HTTP_403_FORBIDDEN)
-
 
     # @action(methods=['post'], detail=True, url_path="services")
     # def add_service(self, request, pk):
@@ -118,11 +118,11 @@ class ServiceViewSet(viewsets.ViewSet,
     serializer_class = ServiceSerializer
     pagination_class = MBasePagination
 
-    # def get_permissions(self):
-    #     if self.action == 'add_comment':
-    #         return [permissions.IsAuthenticated()]
-    #
-    #     return [permissions.AllowAny()]
+    def get_permissions(self):
+        if self.action == 'add_comment':
+            return [permissions.IsAuthenticated()]
+
+        return [permissions.AllowAny()]
 
     def get_queryset(self):
         services = Service.objects.filter(active=True)
@@ -136,28 +136,19 @@ class ServiceViewSet(viewsets.ViewSet,
 
         return services
 
-    # @action(methods=['post'], detail=True, url_path="add_comment")
-    # def add_comment(self, request, pk):
-    #     content = request.data.get('content')
-    #     if content:
-    #         c = Comment.objects.create(content=content,
-    #                                    service=self.get_object(),
-    #                                    creator=request.user)
-    #         return Response(CommentSerializer(c).data, status=status.HTTP_201_CREATED)
-    #
-    #     return Response(status=status.HTTP_400_BAD_REQUEST)
-
 
 class FoodViewSet(viewsets.ViewSet, generics.ListAPIView,
                   generics.RetrieveAPIView):
     queryset = Food.objects.filter(active=True)
     serializer_class = FoodSerializer
+    pagination_class = MBasePagination
 
 
 class MenuViewSet(viewsets.ViewSet, generics.ListAPIView,
                   generics.RetrieveAPIView):
     serializer_class = MenuSerializer
-    # pagination_class = MBasePagination
+
+    pagination_class = MBasePagination
 
     def get_queryset(self):
         menus = Menu.objects.filter(active=True)
@@ -187,7 +178,7 @@ class SystemViewSet(viewsets.ViewSet,
 
 class UserViewSet(viewsets.ViewSet,
                   generics.ListAPIView,
-                  generics.CreateAPIView,):
+                  generics.CreateAPIView, ):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
     parser_classes = [MultiPartParser, ]
@@ -204,6 +195,13 @@ class UserViewSet(viewsets.ViewSet,
                         status=status.HTTP_200_OK)
 
 
+class BankAccViewSet(viewsets.ViewSet, generics.ListAPIView,
+                     generics.DestroyAPIView,
+                     generics.UpdateAPIView):
+    queryset = BankAccount.objects.all()
+    serializer_class = BankAcSerializer
+
+
 class CommentViewSet(viewsets.ViewSet,
                      generics.ListAPIView,
                      generics.CreateAPIView,
@@ -211,7 +209,8 @@ class CommentViewSet(viewsets.ViewSet,
                      generics.UpdateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+
+    # permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         if request.user == self.get_object().creator:

@@ -14,6 +14,7 @@ router.register("shift", views.ShiftViewSet, 'shift')
 router.register("users", views.UserViewSet, 'user')
 router.register("comments", views.CommentViewSet, 'comment')
 router.register("systems", views.SystemViewSet, 'system')
+router.register("bankAccount", views.BankAccViewSet, 'bankAccount')
 urlpatterns = [
     path('', include(router.urls)),
     # path('oauth2-info', views.OauthInfo.as_view())

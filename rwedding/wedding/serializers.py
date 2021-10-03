@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from .models import WeddingHalls, Wedding, Service, User, Food, Menu, Shift, Comment, System
+from .models import WeddingHalls, Wedding, Service, User, Food, Menu, Shift, Comment, System, BankAccount
 
 
 class UserSerializer(ModelSerializer):
@@ -102,6 +102,7 @@ class WeddingSerializer(ModelSerializer):
 
 class WeddingDetailSerializer(WeddingSerializer):
     service = ServiceSerializer(many=True, read_only=True)
+
     # wedding_hall = WeddingHallSerializer()
     # shift = ShiftSerializer()
     # menu = MenuSerializer()
@@ -114,7 +115,13 @@ class WeddingDetailSerializer(WeddingSerializer):
 class CommentSerializer(ModelSerializer):
     class Meta:
         model = Comment
-        fields = ["id", "content", "created_date", "creator"]
+        fields = "__all__"
+
+
+class BankAcSerializer(ModelSerializer):
+    class Meta:
+        model = BankAccount
+        fields = "__all__"
 
 
 class SystemSerializer(ModelSerializer):
