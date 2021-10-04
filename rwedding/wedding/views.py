@@ -5,7 +5,8 @@ from .models import WeddingHalls, Wedding, Service, User, Food, Menu, Shift, Com
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .serializers import WeddingHallSerializer, WeddingSerializer, WeddingDetailSerializer, UserSerializer, \
-    ServiceSerializer, FoodSerializer, MenuSerializer, ShiftSerializer, CommentSerializer, SystemSerializer, BankAcSerializer
+    ServiceSerializer, FoodSerializer, MenuSerializer, ShiftSerializer, CommentSerializer, SystemSerializer, \
+    BankAcSerializer
 from .paginators import MBasePagination
 from django.http import Http404
 
@@ -31,7 +32,6 @@ class WeddingHallViewSet(viewsets.ViewSet,
     def get_weddings(self, request, pk):
         # hall = WeddingHalls.objects.get(pk=pk)
         weddings = self.get_object().weddings.filter(active=True)
-
         return Response(WeddingSerializer(weddings, many=True).data,
                         status=status.HTTP_200_OK)
 
@@ -46,69 +46,63 @@ class WeddingViewSet(viewsets.ViewSet,
 
     # permission_classes = [permissions.IsAuthenticated]
 
-    def list(self, request, *args, **kwargs):
-        if request.user == self.get_object().creator:
-            return super().list(request, *args, **kwargs)
-
-        return Response(status=status.HTTP_403_FORBIDDEN)
-
-    def create(self, request, *args, **kwargs):
-        if request.user == self.get_object().creator:
-            return super().create(request, *args, **kwargs)
-
-        return Response(status=status.HTTP_403_FORBIDDEN)
-
-    def retrieve(self, request, *args, **kwargs):
-        if request.user == self.get_object().creator:
-            return super().retrieve(request, *args, **kwargs)
-
-        return Response(status=status.HTTP_403_FORBIDDEN)
-
-    def partial_update(self, request, *args, **kwargs):
-        if request.user == self.get_object().creator:
-            return super().partial_updat(request, *args, **kwargs)
-
-        return Response(status=status.HTTP_403_FORBIDDEN)
-
-    # @action(methods=['post'], detail=True, url_path="services")
-    # def add_service(self, request, pk):
-    #     try:
-    #         wedding = self.get_object()
-    #     except Http404:
-    #         return Response(status=status.HTTP_404_NOT_FOUND)
-    #     else:
-    #         services = request.data.get("services")
-    #         if services is not None:
-    #             for service in services:
-    #                 s, _ = Service.objects.get_or_create(name=service)
-    #                 wedding.services.add(s)
+    # def create(self, request, *args, **kwargs):
+    #     if request.user == self.get_object().creator:
+    #         return super().create(request, *args, **kwargs)
     #
-    #             wedding.save()
+    #     return Response(status=status.HTTP_403_FORBIDDEN)
     #
-    #             return Response(self.serializer_class(wedding).data,
-    #                             status=status.HTTP_201_CREATED)
+    # def retrieve(self, request, *args, **kwargs):
+    #     if request.user == self.get_object().creator:
+    #         return super().retrieve(request, *args, **kwargs)
     #
-    #     return Response(status=status.HTTP_404_NOT_FOUND)
+    #     return Response(status=status.HTTP_403_FORBIDDEN)
     #
-    # @action(methods=['post'], detail=True, url_path="weddinghalls")
-    # def add_hall(self, request, pk):
-    #     try:
-    #         wedding = self.get_object()
-    #     except Http404:
-    #         return Response(status=status.HTTP_404_NOT_FOUND)
-    #     else:
-    #         halls = request.data.get("weddinghalls")
-    #         if halls is not None:
-    #             for hall in halls:
-    #                 h, _ = WeddingHalls.objects.get_or_create(name=hall)
-    #                 wedding.halls.add(h)
+    # def partial_update(self, request, *args, **kwargs):
+    #     if request.user == self.get_object().creator:
+    #         return super().partial_updat(request, *args, **kwargs)
     #
-    #             wedding.save()
+    #     return Response(status=status.HTTP_403_FORBIDDEN)
     #
-    #             return Response(self.serializer_class(wedding).data,
-    #                             status=status.HTTP_201_CREATED)
-    #
-    #     return Response(status=status.HTTP_404_NOT_FOUND)
+    @action(methods=['post'], detail=True, url_path="services")
+    def add_service(self, request, pk):
+        try:
+            wedding = self.get_object()
+        except Http404:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            services = request.data.get("services")
+            if services is not None:
+                for service in services:
+                    s, _ = Service.objects.get_or_create(name=service)
+                    wedding.services.add(s)
+
+                wedding.save()
+
+                return Response(self.serializer_class(wedding).data,
+                                status=status.HTTP_201_CREATED)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    @action(methods=['post'], detail=True, url_path="weddinghalls")
+    def add_hall(self, request, pk):
+        try:
+            wedding = self.get_object()
+        except Http404:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            halls = request.data.get("weddinghalls")
+            if halls is not None:
+                for hall in halls:
+                    h, _ = WeddingHalls.objects.get_or_create(name=hall)
+                    wedding.halls.add(h)
+
+                wedding.save()
+
+                return Response(self.serializer_class(wedding).data,
+                                status=status.HTTP_201_CREATED)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class ServiceViewSet(viewsets.ViewSet,
@@ -212,23 +206,23 @@ class CommentViewSet(viewsets.ViewSet,
 
     # permission_classes = [permissions.IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
-        if request.user == self.get_object().creator:
-            return super().create(request, *args, **kwargs)
-
-        return Response(status=status.HTTP_403_FORBIDDEN)
-
-    def destroy(self, request, *args, **kwargs):
-        if request.user == self.get_object().creator:
-            return super().destroy(request, *args, **kwargs)
-
-        return Response(status=status.HTTP_403_FORBIDDEN)
-
-    def partial_update(self, request, *args, **kwargs):
-        if request.user == self.get_object().creator:
-            return super().partial_updat(request, *args, **kwargs)
-
-        return Response(status=status.HTTP_403_FORBIDDEN)
+    # def create(self, request, *args, **kwargs):
+    #     if request.user == self.get_object().creator:
+    #         return super().create(request, *args, **kwargs)
+    #
+    #     return Response(status=status.HTTP_403_FORBIDDEN)
+    #
+    # def destroy(self, request, *args, **kwargs):
+    #     if request.user == self.get_object().creator:
+    #         return super().destroy(request, *args, **kwargs)
+    #
+    #     return Response(status=status.HTTP_403_FORBIDDEN)
+    #
+    # def partial_update(self, request, *args, **kwargs):
+    #     if request.user == self.get_object().creator:
+    #         return super().partial_updat(request, *args, **kwargs)
+    #
+    #     return Response(status=status.HTTP_403_FORBIDDEN)
 
 # class OauthInfo(APIView):
 #     def get(self, request):

@@ -6,7 +6,7 @@ from .admin import admin_site
 
 router = routers.DefaultRouter()
 router.register("weddinghalls", views.WeddingHallViewSet, 'weddinghall')
-router.register("weddings", views.WeddingViewSet, 'wedding')
+router.register("weddings", views.WeddingViewSet, 'weddings')
 router.register("services", views.ServiceViewSet, 'service')
 router.register("menus", views.MenuViewSet, 'menu')
 router.register("foods", views.FoodViewSet, 'food')

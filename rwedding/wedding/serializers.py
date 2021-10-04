@@ -31,7 +31,7 @@ class WeddingHallSerializer(ModelSerializer):
 
     class Meta:
         model = WeddingHalls
-        fields = ["id", "name", "image", "system"]
+        fields = ["id", "name", "image", "system", "description"]
 
 
 class ServiceSerializer(ModelSerializer):
